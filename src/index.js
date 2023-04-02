@@ -10,7 +10,7 @@ const galleryContainer = document.querySelector('.gallery');
 
 searchBtn.addEventListener('submit', onSearch);
 loadMore.addEventListener('click', onLoadMore);
-
+// kcnkdjnv
 let searchQuery = '';
 let page = 1;
 const perPage = 30;
