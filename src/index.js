@@ -10,14 +10,15 @@ const galleryContainer = document.querySelector('.gallery');
 
 searchBtn.addEventListener('submit', onSearch);
 loadMore.addEventListener('click', onLoadMore);
-// kcnkdjnv
+
 let searchQuery = '';
 let page = 1;
-const perPage = 30;
+const perPage = 40;
 loadMore.classList.add('is-hidden');
 
 async function onSearch(e) {
   e.preventDefault();
+  page = 1;
 
   searchQuery = e.currentTarget.elements.searchQuery.value.trim();
   const { hits, totalHits, total } = await fetchImages(
@@ -31,15 +32,21 @@ async function onSearch(e) {
       'Sorry, there are no images matching your search query. Please try again.'
     );
     cleanContainer();
+    loadMore.classList.add('is-hidden');
     return;
-  }
-  loadMore.classList.remove('is-hidden');
+  } else if (hits.length < 40) {
+    loadMore.classList.add('is-hidden');
+    Notiflix.Notify.failure(
+      "We're sorry, but you've reached the end of search results."
+    );
+  } else {
+    loadMore.classList.remove('is-hidden');
 
-  page = 1;
-  Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
-  cleanContainer();
-  const galleryRender = onRenderGallery(hits);
-  galleryContainer.insertAdjacentHTML('beforeend', galleryRender);
+    Notiflix.Notify.success(`Hooray! We found ${totalHits} images.`);
+    cleanContainer();
+    const galleryRender = onRenderGallery(hits);
+    galleryContainer.insertAdjacentHTML('beforeend', galleryRender);
+  }
 }
 
 function cleanContainer() {
@@ -54,6 +61,11 @@ async function onLoadMore(e) {
     page,
     perPage
   );
+  if (page > totalHits / perPage) {
+    Notify.info("We're sorry, but you've reached the end of search results.");
+    loadMore.classList.add('is-hidden');
+    return;
+  }
   const galleryRenderImg = onRenderGallery(hits);
   galleryContainer.insertAdjacentHTML('beforeend', galleryRenderImg);
 }
